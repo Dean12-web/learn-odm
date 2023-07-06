@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const User = require('../models/User');
-const { Response, secretKey } = require('../helpers/util');
+const { Response, secretKey, tokenValid } = require('../helpers/util');
 const jwt = require('jsonwebtoken')
 
 
@@ -23,10 +23,22 @@ router.post('/auth', async function (req, res, next) {
   }
 });
 
-router.get('/', async function (req, res, next) {
+router.get('/', tokenValid, async function (req, res, next) {
   try {
-    const users = await User.find()
-    res.status(200).json(new Response(users))
+    const total = await User.countDocuments()
+    const page =  parseInt(req.query.page) || 1
+    const pageSize = parseInt(req.query.pageSize) || 3
+    const limit = 3
+    const offset = (page - 1) * pageSize
+    const pages = Math.ceil(total / pageSize)
+    const users = await User.find().skip(offset).limit(pageSize).sort({'_id': -1})
+    res.status(200).json(new Response({
+      users,
+      // limit,
+      // page,
+      // pages,
+      // total
+    }))
   } catch (error) {
     console.log(error)
     res.status(500).json(new Response('Error Showing Data Users', false))

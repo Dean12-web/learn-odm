@@ -20,7 +20,7 @@ userSchema.pre(['updateOne', 'findOneAndUpdate'], function (next) {
     //For Update Password Especially When U Want to Hashing The Password
     //Use _update.password to Access the Password in DB
     //Notes. Method Can be Changes Depend On when The Libray Updated 
-    console.log('modified', this._update.password)
+    // console.log('modified', this._update.password)
     if (this._update.password) {
         this._update.password = bcrypt.hashSync(this._update.password, saltRounds)
     }
